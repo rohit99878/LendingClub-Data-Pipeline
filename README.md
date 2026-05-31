@@ -11,7 +11,6 @@ Production-grade PySpark data pipeline on AWS EMR processing 2.26M loan records 
 | Rejected Records | 5,873 |
 | Data Quality Score | 99.65% |
 | Pipeline Status | SUCCESS |
-| Total AWS Cost | ~$0.30 |
 
 ## Architecture
 
@@ -42,15 +41,16 @@ Production-grade PySpark data pipeline on AWS EMR processing 2.26M loan records 
 
 ## Project Structure
 
+```
 LendingClub-Data-Pipeline/
-├── notebooks/          # Jupyter notebooks with outputs
+├── notebooks/
 │   ├── 01_data_exploration.ipynb
 │   ├── 02_bronze_ingestion.ipynb
 │   ├── 03_silver_validation.ipynb
 │   ├── 04_gold_transformation.ipynb
 │   ├── 05_quality_report_and_analytics.ipynb
 │   └── 06_aws_orchestration_monitoring.ipynb
-├── src/loanshield/     # Production Python package
+├── src/loanshield/
 │   ├── bronze.py
 │   ├── silver.py
 │   ├── gold.py
@@ -58,10 +58,11 @@ LendingClub-Data-Pipeline/
 │   ├── settings.py
 │   └── spark_session.py
 ├── jobs/
-│   └── main_pipeline.py  # EMR spark-submit entry point
+│   └── main_pipeline.py
 ├── lambda/
 │   └── lambda_submit_emr_step.py
 └── README.md
+```
 
 
 ## How to Run
