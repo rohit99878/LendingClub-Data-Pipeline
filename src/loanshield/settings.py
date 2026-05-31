@@ -10,7 +10,7 @@ class PipelineConfig:
     gold_path: str
     rejected_path: str
     reports_path: str
-    sample_rows: int | None = None
+    sample_rows: "int | None" = None
 
 
 REQUIRED_COLUMNS = [
