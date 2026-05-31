@@ -91,7 +91,7 @@ s3://<bucket>/scripts/main_pipeline.py] \
 - ✅ CloudWatch monitoring dashboard
 - ✅ Full rejection audit trail
 
-## AWS Execution Proof
+## AWS Execution Screenshots
 
 ### EMR Clusters (Terminated after pipeline completion)
 ![EMR Clusters](aws-proof/01_emr_clusters_terminated.png)
