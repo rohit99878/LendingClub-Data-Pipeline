@@ -94,10 +94,10 @@ s3://<bucket>/scripts/main_pipeline.py] \
 ## AWS Execution Screenshots
 
 ### EMR Clusters (Terminated after pipeline completion)
-![EMR Clusters](aws-proof/01_emr_clusters_terminated.png)
+![EMR Clusters](aws_screenshots/01_emr_clusters_terminated.png)
 
 ### S3 Gold Bucket (Delta Lake output)
-![S3 Gold Bucket](aws-proof/02_s3_gold_bucket.png)
+![S3 Gold Bucket](aws_screenshots/02_s3_gold_bucket.png)
 
 ### Athena Query Results (SQL on Delta Lake)
-![Athena Results](aws-proof/03_athena_query_results.png)
+![Athena Results](aws_screenshots/03_athena_query_results.png)
