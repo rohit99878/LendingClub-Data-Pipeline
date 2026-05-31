@@ -1,125 +1,91 @@
-# LoanShield AWS Data Engineering Pipeline
+# LendingClub Data Pipeline 🚀
 
-LoanShield is a portfolio data engineering project built on AWS. It processes raw loan data from S3 into Bronze, Silver, and Gold analytical layers using EMR, PySpark, SparkSQL, and Delta Lake, then prepares the Gold layer for Redshift analytics and CloudWatch monitoring.
+Production-grade PySpark data pipeline on AWS EMR processing 2.26M loan records through Medallion Architecture (Bronze→Silver→Gold) with Delta Lake, AWS Glue, and Athena.
 
-## Portfolio Focus
+## Pipeline Results (Live AWS Run)
+| Metric | Value |
+|--------|-------|
+| Records Processed | 2,260,701 |
+| Silver Records | 2,252,828 |
+| Gold Records | 2,252,828 |
+| Rejected Records | 5,873 |
+| Data Quality Score | 99.65% |
+| Pipeline Status | SUCCESS |
+| Total AWS Cost | ~$0.30 |
 
-This repository is notebook-first because the project is intended for GitHub and resume review. The main notebook should be run in EMR Studio and saved with outputs visible.
+## Architecture
 
-```text
-S3 Raw CSV
-  -> EMR Studio PySpark Notebook
-  -> Bronze Delta on S3
-  -> Silver Delta + Rejected Records on S3
-  -> Gold Delta on S3
-  -> Redshift Analytics Layer
-  -> CloudWatch Logs / Lambda Trigger
-```
+## Tech Stack
+- **Compute:** AWS EMR EC2 (m5.xlarge, auto-terminating)
+- **Storage:** AWS S3 (6 buckets, Delta Lake format)
+- **Processing:** PySpark 3.4, Delta Lake
+- **Catalog:** AWS Glue Data Catalog
+- **Analytics:** AWS Athena (SQL on Delta Lake)
+- **Automation:** AWS Lambda (S3 event trigger)
+- **Monitoring:** AWS CloudWatch Dashboard
+- **Language:** Python 3.11
 
-## Repository Structure
+## Medallion Architecture
+| Layer | Records | Size | Description |
+|-------|---------|------|-------------|
+| Bronze | 2,260,701 | 389 MB | Raw ingestion from CSV |
+| Silver | 2,252,828 | 35 MB | Validated + cleaned |
+| Gold | 2,252,828 | 37 MB | Enriched with risk categories |
+| Rejected | 5,873 | 158 KB | Bad records with rejection reasons |
 
-```text
-LoanShield_AWS_Portfolio/
-  README.md
-  notebooks/
-    01_data_exploration.ipynb
-    02_bronze_ingestion.ipynb
-    03_silver_validation.ipynb
-    04_gold_transformation.ipynb
-    05_quality_report_and_analytics.ipynb
-    06_aws_orchestration_monitoring.ipynb
-  src/
-    loanshield/
-      bronze.py
-      silver.py
-      gold.py
-      quality.py
-      settings.py
-      spark_session.py
-  jobs/
-    main_pipeline.py
-  lambda/
-    lambda_submit_emr_step.py
-  docs/
-    resume_bullets.md
-```
+## Athena SQL Insights
+| Risk Category | Loan Count | Avg Loan Amount |
+|---------------|------------|-----------------|
+| Low Risk | 1,093,881 | $14,333.82 |
+| Medium Risk | 970,776 | $15,260.44 |
+| High Risk | 188,171 | $18,045.52 |
 
-## Important Note About Dataset
+## Project Structure
 
-The full input dataset should stay in S3, not GitHub. GitHub should include the notebook, code, screenshots/output, and the S3 path pattern. Large datasets should not be committed to the repository.
+LendingClub-Data-Pipeline/
+├── notebooks/          # Jupyter notebooks with outputs
+│   ├── 01_data_exploration.ipynb
+│   ├── 02_bronze_ingestion.ipynb
+│   ├── 03_silver_validation.ipynb
+│   ├── 04_gold_transformation.ipynb
+│   ├── 05_quality_report_and_analytics.ipynb
+│   └── 06_aws_orchestration_monitoring.ipynb
+├── src/loanshield/     # Production Python package
+│   ├── bronze.py
+│   ├── silver.py
+│   ├── gold.py
+│   ├── quality.py
+│   ├── settings.py
+│   └── spark_session.py
+├── jobs/
+│   └── main_pipeline.py  # EMR spark-submit entry point
+├── lambda/
+│   └── lambda_submit_emr_step.py
+└── README.md
 
-## How To Use For Portfolio
 
-1. Open the notebooks in EMR Studio.
-2. Attach it to an EMR cluster with Spark and Delta Lake support.
-3. Run notebooks `01` through `05` in order.
-4. First run with `SAMPLE_ROWS = 10000` to validate cheaply.
-5. For final portfolio output, set `SAMPLE_ROWS = None` in notebooks `01` and `02`, then rerun the full dataset.
-6. Save the notebooks with outputs.
-7. Upload the saved notebooks to GitHub.
-
-## Notebook Guide
-
-| Notebook | Purpose |
-| --- | --- |
-| `01_data_exploration.ipynb` | Reads raw S3 data, shows schema, samples, null checks, and category distributions. |
-| `02_bronze_ingestion.ipynb` | Writes raw data to the Bronze Delta layer on S3. |
-| `03_silver_validation.ipynb` | Applies data quality rules and writes Silver plus rejected records. |
-| `04_gold_transformation.ipynb` | Uses SparkSQL to create analytics-ready Gold data. |
-| `05_quality_report_and_analytics.ipynb` | Shows final counts, quality score, and business analytics outputs. |
-| `06_aws_orchestration_monitoring.ipynb` | Documents Lambda, CloudWatch, Redshift, and production orchestration design. |
-
-## Notebook And Production Code Strategy
-
-This project includes both notebooks and Python files intentionally.
-
-- `notebooks/` shows the development workflow and portfolio-visible outputs.
-- `src/loanshield/` contains the production-style reusable PySpark modules.
-- `jobs/main_pipeline.py` is the Spark job entry point for EMR `spark-submit`.
-
-This mirrors a common data engineering workflow:
-
-```text
-Explore and validate in notebooks
-  -> move stable logic into Python modules
-  -> deploy as a Spark job
-  -> orchestrate and monitor on AWS
-```
-
-## AWS Services Used
-
-- Amazon S3 for data lake storage
-- Amazon EMR / EMR Studio for PySpark execution
-- PySpark and SparkSQL for transformations
-- Delta Lake for Bronze/Silver/Gold storage
-- Amazon Redshift for analytics consumption
-- AWS Lambda / EventBridge for orchestration design
-- CloudWatch for logs and monitoring
-
-## Resume Bullet
-
-Built an AWS data engineering pipeline using S3, EMR Studio, PySpark, SparkSQL, Delta Lake, Redshift, Lambda, and CloudWatch to process raw loan data into Bronze, Silver, and Gold analytical layers with validation, rejected-record handling, and quality reporting.
-
-## Production Spark Submit
-
-Package the source code:
-
+## How to Run
 ```bash
-cd LoanShield_AWS_Portfolio
-cd src
-zip -r ../loanshield_src.zip loanshield
-cd ..
-aws s3 cp loanshield_src.zip s3://YOUR-CODE-BUCKET/loanshield/jobs/loanshield_src.zip
-aws s3 cp jobs/main_pipeline.py s3://YOUR-CODE-BUCKET/loanshield/jobs/main_pipeline.py
+aws emr create-cluster \
+  --name "lendingclub-pipeline" \
+  --release-label emr-6.15.0 \
+  --applications Name=Spark \
+  --ec2-attributes SubnetId=<your-subnet>,InstanceProfile=EMR_EC2_DefaultRole \
+  --service-role EMR_DefaultRole \
+  --instance-groups \
+    InstanceGroupType=MASTER,InstanceType=m5.xlarge,InstanceCount=1 \
+    InstanceGroupType=CORE,InstanceType=m5.xlarge,InstanceCount=2 \
+  --steps Type=Spark,Name="Pipeline",ActionOnFailure=TERMINATE_CLUSTER,\
+Args=[--deploy-mode,cluster,--py-files,s3://<bucket>/scripts/loanshield.zip,\
+s3://<bucket>/scripts/main_pipeline.py] \
+  --auto-terminate
 ```
 
-Run a cost-controlled sample:
-
-```bash
-spark-submit \
-  --conf spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension \
-  --conf spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog \
-  --py-files s3://YOUR-CODE-BUCKET/loanshield/jobs/loanshield_src.zip \
-  s3://YOUR-CODE-BUCKET/loanshield/jobs/main_pipeline.py \
-  --sample-rows 10000
-```
+## Key Features
+- ✅ Medallion Architecture (Bronze/Silver/Gold)
+- ✅ Delta Lake ACID transactions
+- ✅ 14 data validation business rules
+- ✅ Auto-terminating EMR cluster (cost optimized)
+- ✅ Automated Lambda trigger on S3 upload
+- ✅ CloudWatch monitoring dashboard
+- ✅ Full rejection audit trail
